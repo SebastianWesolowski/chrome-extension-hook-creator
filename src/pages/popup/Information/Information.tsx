@@ -37,10 +37,11 @@ const Information = ({
             )}
           </p>
         </div>
-        <div className="flex-1 min-w-0 text-sm py-2">
-          <b className="font-bold">Current shortcut:</b>
+        <div className="flex-1 min-w-0 py-2">
+          <b className="font-bold text-sm">Current shortcut:</b>
           <p className={"break-words"}>
-            {settingShortcut === "" ? (
+            {settingShortcut.metaKey === false ||
+            settingShortcut.metaKey === false ? (
               <>
                 {" "}
                 <p className={"text-sm pb-1"}>No shortcut set</p>
@@ -53,7 +54,17 @@ const Information = ({
                 </button>
               </>
             ) : (
-              settingShortcut
+              <>
+                <kbd>
+                  {settingShortcut.metaKey ?? String(settingShortcut.metaKey)}
+                </kbd>
+                {settingShortcut.secondKey && (
+                  <>
+                    {" + "}
+                    <kbd>{String(settingShortcut.secondKey)}</kbd>
+                  </>
+                )}
+              </>
             )}
           </p>
         </div>

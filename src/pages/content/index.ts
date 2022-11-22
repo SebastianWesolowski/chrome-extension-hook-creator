@@ -1,19 +1,20 @@
-console.log("content loaded");
-
-/**
- * @description
- * Chrome extensions don't support modules in content scripts.
- */
-import("./components/Demo");
-
 // import { printLine } from './modules/print';
 
 // Keep track of clicked keys
-const isKeyPressed = {
-  a: false, // ASCII code for 'a'
-  b: false, // ASCII code for 'b'
-  // ... Other keys to check for custom key combinations
+const settingShortcut = {
+  metaKey: null,
+  secondKey: null,
 };
+
+const isKeyPressed = {};
+
+chrome.storage.sync.get(["settingShortcut"], function (items) {
+  settingShortcut.metaKey = items.settingShortcut.metaKey;
+  settingShortcut.secondKey = items.settingShortcut.secondKey;
+
+  isKeyPressed[settingShortcut.metaKey] = false;
+  isKeyPressed[settingShortcut.secondKey] = false;
+});
 
 function sendMessage(content) {
   chrome.storage.sync.get(["settingsWebhook"], function (items) {
@@ -36,10 +37,14 @@ let isShortcutPressed = false;
 
 document.onkeydown = (keyDownEvent) => {
   // Track down key click
+
   isKeyPressed[keyDownEvent.key] = true;
 
   // Check described custom shortcut
-  if (isKeyPressed["a"] && isKeyPressed["b"]) {
+  if (
+    isKeyPressed[settingShortcut.metaKey] &&
+    isKeyPressed[settingShortcut.secondKey]
+  ) {
     isShortcutPressed = true;
     //Prevent default key actions, if desired
     keyDownEvent.preventDefault();
@@ -56,9 +61,12 @@ document.onkeyup = (keyUpEvent) => {
 
   // when one of the keys is released, show text indicating
   // text is no longer clicked
-  if (!isKeyPressed["a"] || !isKeyPressed["b"]) {
+  if (
+    !isKeyPressed[settingShortcut.metaKey] ||
+    !isKeyPressed[settingShortcut.secondKey]
+  ) {
     isShortcutPressed = false;
-    console.log("Shortcut clicked! UP");
+    // console.log("Shortcut clicked! UP");
   }
 };
 

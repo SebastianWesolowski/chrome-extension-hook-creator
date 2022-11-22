@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import ShortcutSettings from "@pages/popup/Settings/ShortcutSettings";
-// import logo from "@assets/img/logo.svg";
-// import "@pages/popup/Settings.css";
+import { CheckIcon } from "@heroicons/react/solid";
 
 const Settings = ({ settingShortcut, settingWebhook }: any) => {
+  const [currentSettingWebhook, setCurrentSettingWebhook] =
+    useState(settingWebhook);
   const [isSave, setIsSave] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -11,15 +12,20 @@ const Settings = ({ settingShortcut, settingWebhook }: any) => {
     if (isSave) {
       setInterval(() => {
         setIsSave(false);
-      }, 1000);
+      }, 2000);
     }
   }, [isSave]);
 
-  const handleSettingChange = (e) => {
-    // setSettingWebhook(e.target.value);
-    // chrome.storage.sync.set({ settingsWebhook: e.target.value }, function () {
-    //   setIsSave(true);
-    // });
+  const handleOnChange = (e) => {
+    setCurrentSettingWebhook(e.target.value);
+  };
+  const handleSettingChange = () => {
+    chrome.storage.sync.set(
+      { settingsWebhook: currentSettingWebhook },
+      function () {
+        setIsSave(true);
+      }
+    );
   };
 
   return (
@@ -37,6 +43,8 @@ const Settings = ({ settingShortcut, settingWebhook }: any) => {
           </label>
           <div className="mt-1">
             <textarea
+              value={currentSettingWebhook}
+              onChange={handleOnChange}
               rows={3}
               name="comment"
               id="comment"
@@ -44,16 +52,60 @@ const Settings = ({ settingShortcut, settingWebhook }: any) => {
               defaultValue={""}
             />
           </div>
+          <div className="flex-row flex items-center mt-1">
+            <button
+              onClick={() => {
+                handleSettingChange();
+              }}
+              type="button"
+              className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            >
+              {settingWebhook ? "Set new Webhook" : "Save webhook"}
+            </button>
+            {isSave && (
+              <div className="ml-2 flex flex-row items-center">
+                <div className="mr-1 flex items-center justify-center h-5 w-5 rounded-full bg-green-100 ">
+                  <CheckIcon
+                    className="h-3 w-3 text-green-600"
+                    aria-hidden="true"
+                  />
+                </div>
+                <p className="text-sm text-gray-500 mr-1">New webhook saved</p>
+              </div>
+            )}
+          </div>
         </div>
-        <p className="block text-sm font-medium mb-1">Shortcut</p>
+        <p className="block text-sm font-medium mt-1">Shortcut</p>
+        <>
+          <kbd>
+            {settingShortcut.metaKey ?? String(settingShortcut.metaKey)}
+          </kbd>
+          {settingShortcut.secondKey && (
+            <>
+              {" + "}
+              <kbd>{String(settingShortcut.secondKey)}</kbd>
+            </>
+          )}
+        </>
+        <br />
+
         <button
           onClick={() => setIsOpen(!isOpen)}
           type="button"
-          className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          className="mt-1 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >
-          Set Shortcut
+          {settingShortcut.metaKey !== false &&
+          settingShortcut.secondKey !== false
+            ? "Set new shortcut"
+            : "Set shortcut"}
         </button>
-        <ShortcutSettings open={isOpen} setOpen={setIsOpen} />
+        {isOpen && (
+          <ShortcutSettings
+            open={isOpen}
+            setOpen={setIsOpen}
+            settingShortcut={settingShortcut}
+          />
+        )}
       </div>
     </div>
   );
