@@ -15,6 +15,11 @@ chrome.storage.sync.get(["settingShortcut"], function (items) {
   isKeyPressed[settingShortcut.metaKey] = false;
   isKeyPressed[settingShortcut.secondKey] = false;
 });
+let templateText = "";
+
+chrome.storage.sync.get(["settingTemplate"], function (items) {
+  templateText = items.settingTemplate;
+});
 
 function sendMessage(content) {
   chrome.storage.sync.get(["settingsWebhook"], function (items) {
@@ -74,8 +79,10 @@ const copyListener = (event) => {
   if (isShortcutPressed) {
     const range = window.getSelection().getRangeAt(0);
     const rangeContents = range.cloneContents();
-    const pageLink = `Read more at: ${document.location.href}`;
+    const pageLink = `${document.location.href}`;
     const helper = document.createElement("div");
+
+    const currentDate = new Date().toISOString().slice(0, -5);
 
     helper.appendChild(rangeContents);
 
@@ -87,7 +94,12 @@ const copyListener = (event) => {
       "text/html",
       `${helper.innerHTML}<br>${pageLink}`
     );
-    sendMessage(`${helper.innerText}\n${pageLink}`);
+
+    templateText = templateText.replace("%%selected%%", helper.innerText);
+    templateText = templateText.replace("%%url%%", pageLink);
+    templateText = templateText.replace("%%date%%", currentDate);
+
+    sendMessage(templateText);
 
     event.preventDefault();
   }

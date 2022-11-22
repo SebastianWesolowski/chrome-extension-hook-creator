@@ -7,6 +7,7 @@ const Pages = ({
   tabSelected,
   settingWebhook,
   settingShortcut,
+  setRefreshPage,
 }: any) => {
   return (
     <div className="flex flex-col">
@@ -19,6 +20,7 @@ const Pages = ({
       )}
       {tabSelected === "settings" && (
         <Settings
+          setRefreshPage={setRefreshPage}
           settingWebhook={settingWebhook}
           settingShortcut={settingShortcut}
         />

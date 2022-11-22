@@ -8,7 +8,12 @@ import React, {
 import { Dialog, Transition } from "@headlessui/react";
 import { CheckIcon } from "@heroicons/react/solid";
 
-const ShortcutSettings = ({ open, setOpen, settingShortcut }: any) => {
+const ShortcutSettings = ({
+  open,
+  setOpen,
+  settingShortcut,
+  setRefreshPage,
+}: any) => {
   const [isShortcutSave, setIsShortcutSave] = useState(false);
   const [isShortcutCaptured, setIsShortcutCaptured] = useState(false);
   const [isRecord, setIsRecord] = useState(false);
@@ -108,6 +113,7 @@ const ShortcutSettings = ({ open, setOpen, settingShortcut }: any) => {
       shortcut.metaKey !== false)
     ) {
       chrome.storage.sync.set({ settingShortcut: shortcut }, function () {
+        setRefreshPage(true);
         setIsShortcutSave(true);
         setCurrentSettingShortcut(shortcut);
       });
