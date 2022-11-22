@@ -1,6 +1,6 @@
 {
   "name": "chrome-extension-hook-creator",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Chrome extension to send data via webhook in a specific format",
   "license": "MIT",
   "repository": {
